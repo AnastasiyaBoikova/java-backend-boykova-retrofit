@@ -16,20 +16,20 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class DeleteNegativeTests {
     static ProductService productService;
-    static int productId=10000;
+    Long productId = 10000L;
 
     @BeforeAll
     static void beforeAll() {
         productService = RetrofitUtils.getRetrofit().create(ProductService.class);
     }
 
-
-    @DisplayName("deleteProduct негативный тест")
+    @DisplayName("deleteProduct негативный тест по несуществующему Id")
     @Test
-    void DeleteProductTests() {
+    void DeleteProductNegativeTests() {
 
         try {
             Response<ResponseBody> response =
+
                     productService.deleteProduct(productId)
                             .execute();
             assertThat(response.errorBody().string());
@@ -38,6 +38,4 @@ public class DeleteNegativeTests {
             e.printStackTrace();
         }
     }
-
-
 }

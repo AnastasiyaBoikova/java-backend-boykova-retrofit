@@ -8,6 +8,7 @@ import retrofit2.Response;
 import ru.market.retrofit.category.enums.CategoryType;
 import ru.market.retrofit.dto.Product;
 import ru.market.retrofit.service.ProductService;
+import ru.market.retrofit.util.ProductSqlSession;
 import ru.market.retrofit.util.RetrofitUtils;
 import java.io.IOException;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -16,7 +17,8 @@ public class PostPositiveTests {
     static ProductService productService;
     Product product;
     Faker faker = new Faker();
-    static int productId;
+    static Long productId;
+    ProductSqlSession productSqlSession = new ProductSqlSession();
 
     @BeforeAll
     static void beforeAll() {
@@ -42,19 +44,23 @@ public class PostPositiveTests {
         productId = response.body().getId();
         assertThat(response.code()).as("Статус не 201").isEqualTo(201);
         assertThat(response.body().getId()).as("id не присвоилось").isNotNull();
-
+        assertThat(productSqlSession.productMapper().selectByPrimaryKey(productId))
+                .as("продукт не создался").isNotNull();
     }
 
     @AfterEach
     void tearDown() {
-        try {
-            Response<ResponseBody> response =
-                    productService.deleteProduct(productId)
-                            .execute();
-            assertThat(response.isSuccessful()).isTrue();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Response<ResponseBody> response =
+//                    productService.deleteProduct(productId)
+//                            .execute();
+//            assertThat(response.isSuccessful()).isTrue();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        productSqlSession.productMapper().deleteByPrimaryKey(productId);
+        assertThat(productSqlSession.productMapper().selectByPrimaryKey(productId))
+                .as("Тестовый продукт не удалился").isEqualTo(null);
     }
 }
 

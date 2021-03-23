@@ -8,6 +8,7 @@ import retrofit2.Response;
 import ru.market.retrofit.category.enums.CategoryType;
 import ru.market.retrofit.dto.Product;
 import ru.market.retrofit.service.ProductService;
+import ru.market.retrofit.util.ProductSqlSession;
 import ru.market.retrofit.util.RetrofitUtils;
 
 import java.io.IOException;
@@ -18,10 +19,11 @@ public class PutPositiveTests {
     static ProductService productService;
     Product product;
     Faker faker = new Faker();
-    static int productId;
+    static Long productId;
     static int productPrice;
     static String productTitle;
     static String categoryTitle;
+    ProductSqlSession productSqlSession = new ProductSqlSession();
 
 
     @BeforeAll
@@ -70,14 +72,17 @@ public class PutPositiveTests {
 
     @AfterEach
     void tearDown() {
-        try {
-            Response<ResponseBody> response =
-                    productService.deleteProduct(productId)
-                            .execute();
-            assertThat(response.isSuccessful()).isTrue();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Response<ResponseBody> response =
+//                    productService.deleteProduct(productId)
+//                            .execute();
+//            assertThat(response.isSuccessful()).isTrue();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        productSqlSession.productMapper().deleteByPrimaryKey(productId);
+        assertThat(productSqlSession.productMapper().selectByPrimaryKey(productId))
+                .as("Тестовый продукт не удалился").isEqualTo(null);
     }
 }
 

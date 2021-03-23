@@ -7,6 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.With;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 
 @With
@@ -16,12 +19,14 @@ import lombok.With;
 public class Product {
 
     @JsonProperty("id")
-    private Integer id;
+    private Long id;
     @JsonProperty("title")
     private String title;
     @JsonProperty("price")
     private Integer price;
     @JsonProperty("categoryTitle")
     private String categoryTitle;
+    @JsonProperty("products")
+    private List<Product> products = new ArrayList<Product>();
 
 }

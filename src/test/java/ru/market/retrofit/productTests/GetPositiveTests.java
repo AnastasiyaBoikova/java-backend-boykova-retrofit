@@ -8,6 +8,7 @@ import retrofit2.Response;
 import ru.market.retrofit.category.enums.CategoryType;
 import ru.market.retrofit.dto.Product;
 import ru.market.retrofit.service.ProductService;
+import ru.market.retrofit.util.ProductSqlSession;
 import ru.market.retrofit.util.RetrofitUtils;
 
 import java.io.IOException;
@@ -18,10 +19,11 @@ public class GetPositiveTests {
     static ProductService productService;
     Product product;
     Faker faker = new Faker();
-    static int productId;
+    static Long productId;
     static int productPrice;
     static String productTitle;
     static String categoryTitle;
+    ProductSqlSession productSqlSession = new ProductSqlSession();
 
     @BeforeAll
     static void beforeAll() {
@@ -43,6 +45,12 @@ public class GetPositiveTests {
         productPrice = response.body().getPrice();
         productTitle = response.body().getTitle();
         categoryTitle = response.body().getCategoryTitle();
+        assertThat(productSqlSession.productMapper().selectByPrimaryKey(productId))
+                .as("Продукт не создался").isNotNull();
+        assertThat(productSqlSession.productMapper().selectByPrimaryKey(productId).getTitle())
+                .as("Название отсутствует").isNotNull();
+        assertThat(productSqlSession.productMapper().selectByPrimaryKey(productId).getCategory_id())
+                .as("Категория продукта отсутствует").isNotNull();
     }
 
     @SneakyThrows
@@ -55,7 +63,7 @@ public class GetPositiveTests {
         assertThat(response.body().getTitle()).as("Тип товара не верный.").isEqualTo(productTitle);
         assertThat(response.body().getPrice()).as("Цена не верная").isEqualTo(productPrice);
         assertThat(response.body().getCategoryTitle()).as("Категория не верная.").isEqualTo(categoryTitle);
-
+        assertThat(response.body().getId()).as("Id не равень null").isNotNull();
 
     }
 
@@ -63,15 +71,9 @@ public class GetPositiveTests {
     @AfterEach
     void tearDown() {
 
-        try {
-            Response<ResponseBody> response =
-                    productService.deleteProduct(productId)
-                            .execute();
-            assertThat(response.isSuccessful()).isTrue();
-            assertThat(response.code()).as("Продукт не удален").isEqualTo(200);
-        } catch (
-                IOException e) {
-            e.printStackTrace();
-        }
+        productSqlSession.productMapper().deleteByPrimaryKey(productId);
+
+        assertThat(productSqlSession.productMapper().selectByPrimaryKey(productId))
+                .as("Тестовый продукт не удален").isEqualTo(null);
     }
 }
