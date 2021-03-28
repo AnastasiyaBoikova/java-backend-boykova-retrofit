@@ -6,7 +6,7 @@
 <generatorConfiguration>
     <!--            Путь к файлу на локальном компьютере-->
     <classPathEntry
-            location="/Users/Admin/.m2/repository/org/postgresql/postgresql/42.2.19/postgresql-42.2.19.jar"/>
+            location="src/main/resources/postgresql-42.2.19.jar"/>
 
     <context id="DB2Tables" targetRuntime="MyBatis3">
         <jdbcConnection driverClass="org.postgresql.Driver"
